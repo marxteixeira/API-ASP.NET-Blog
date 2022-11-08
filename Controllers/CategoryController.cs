@@ -24,7 +24,7 @@ namespace Blog.Controllers
             }
         }
 
-        [HttpGet("v1/categories/{id:int}")]
+        [HttpGet("v1/categories/{id}")] // removi :int
         public async Task<IActionResult> GetByIdAsync(
             [FromRoute] int id,
             [FromServices] BlogDataContext context)
@@ -56,7 +56,6 @@ namespace Blog.Controllers
             {
                 var category = new Category
                 {
-                    Id = 0,
                     Name = model.Name,
                     Slug = model.Slug.ToLower(),
                 };
@@ -76,7 +75,7 @@ namespace Blog.Controllers
             }
         }
 
-        [HttpPut("v1/categories/{Id: int}")]
+        [HttpPut("v1/categories/{Id}")] // removi :int
         public async Task<IActionResult> PutAsync(
             [FromRoute] int id,
             [FromBody] Category model,
@@ -103,7 +102,7 @@ namespace Blog.Controllers
             }
         }
 
-        [HttpDelete("v1/categories/{Id: int}")]
+        [HttpDelete("v1/categories/{Id}")] // removi :int
         public async Task<IActionResult> DeleteAsync(
             [FromRoute] int id,
             [FromServices] BlogDataContext context)
