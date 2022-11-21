@@ -8,9 +8,7 @@ using System.Text;
 var builder = WebApplication.CreateBuilder(args);
 ConfigureAuthentication(builder);
 ConfigureMvc(builder);
-
-
-
+ConfigureService(builder);  
 
 
 var app = builder.Build();
