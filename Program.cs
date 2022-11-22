@@ -12,6 +12,8 @@ ConfigureService(builder);
 
 
 var app = builder.Build();
+
+
 LoadConfiguration(app);
 
 
@@ -70,3 +72,4 @@ void ConfigureService(WebApplicationBuilder builder)
     builder.Services.AddTransient<TokenService>();
     builder.Services.AddTransient<EmailService>();
 }
+
