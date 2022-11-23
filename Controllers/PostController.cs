@@ -1,4 +1,6 @@
 ﻿using Blog.Data;
+using Blog.Models;
+using Blog.ViewModel;
 using Blog.ViewModel.Posts;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -14,26 +16,67 @@ namespace Blog.Controllers
             [FromQuery] int page = 0,
             [FromQuery] int pageSize = 25)
         {
-            var posts = await context
-                .Posts
-                .AsNoTracking()
-                .Include(x => x.Category)
-                .Include(x => x.Author)
-                .Select(x =>
-                new ListPostsViewModels
+            try
+            {
+                var count = await context.Posts.AsNoTracking().CountAsync();
+                var posts = await context
+                    .Posts
+                    .AsNoTracking()
+                    .Include(x => x.Category)
+                    .Include(x => x.Author)
+                    .Select(x =>
+                    new ListPostsViewModels
+                    {
+                        Id = x.Id,
+                        Title = x.Title,
+                        Slug = x.Slug,
+                        LastUpdateDate = x.LastUpdateDate,
+                        Category = x.Category.Name,
+                        Author = $"{x.Author.Name} ({x.Author.Email})"
+                    })
+                    .Skip(page * pageSize)
+                    .Take(pageSize)
+                    .OrderByDescending(x => x.LastUpdateDate)
+                    .ToListAsync();
+
+                return Ok(new ResultViewModel<dynamic>(new
                 {
-                    Id = x.Id,
-                    Title = x.Title,
-                    Slug = x.Slug,
-                    LastUpdateDate = x.LastUpdateDate,
-                    Category = x.Category.Name,
-                    Author = $"{x.Author.Name} ({x.Author.Email})"
-                })
-                .Skip(page * pageSize)
-                .Take(pageSize)
-                .OrderByDescending(x => x.LastUpdateDate)
-                .ToListAsync();  
-            return Ok(posts);
+                    total = count,
+                    page,
+                    pageSize,
+                    posts
+                }));
+            }
+            catch
+            {
+                return StatusCode(500, new ResultViewModel<List<Post>>("05X04 - Falha interna no servidor"));
+            }
+        }
+
+        [HttpGet("v1/posts{id:int}")]
+        public async Task<IActionResult> DetailAsync(
+            [FromServices] BlogDataContext context,
+            [FromRoute] int id )
+        {
+            try
+            {
+                var post = await context
+                    .Posts
+                    .AsNoTracking()
+                    .Include(x => x.Author)
+                    .ThenInclude(x => x.Roles)
+                    .Include(x => x.Category)
+                    .FirstOrDefaultAsync(x => x.Id == id);
+
+                if (post == null)
+                    return NotFound(new ResultViewModel<Post>("Conteúdo não encontrado"));
+
+                return Ok(new ResultViewModel<Post>(post));
+            }
+            catch(Exception ex)
+            {
+                return StatusCode(500, new ResultViewModel<List<Post>>("05X04 - Falha interna no servidor"));
+            }
         }
     }
 }
