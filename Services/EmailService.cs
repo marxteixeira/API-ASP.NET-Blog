@@ -10,7 +10,7 @@ namespace Blog.Services
             string toEmail,
             string subject,
             string body,
-            string fromName = "Equipe suporte.io",
+            string fromName = "Equipe Suporte.io",
             string fromEmail = "email@suporte.io")
         {
             var smtpClient = new SmtpClient(Configuration.Smtp.Host, Configuration.Smtp.Port);
