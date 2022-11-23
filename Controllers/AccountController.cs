@@ -111,7 +111,7 @@ namespace Blog.Controllers
 
             try
             {
-                await System.IO.File.WriteAllBytesAsync($"wwwroot/image/{fileName}", bytes);
+                await System.IO.File.WriteAllBytesAsync($"wwwroot/images/{fileName}", bytes);
 
             }
             catch(Exception ex)
